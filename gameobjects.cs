@@ -55,6 +55,17 @@ namespace asciiadventure {
                 return "";
             }
             GameObject gameObject = Screen[newRow, newCol];
+
+            int originalRow = Row;
+            int originalCol = Col;
+
+            if (gameObject is Portal){
+                Portal portal = (Portal)gameObject;
+                Row = portal.other.Row;
+                Col = portal.other.Col;
+                Screen[originalRow, originalCol] = null;
+                return "";
+            }
             if (gameObject != null && !gameObject.IsPassable()) {
                 // TODO: How to handle other objects?
                 // walls just stop you
@@ -66,12 +77,11 @@ namespace asciiadventure {
                 return "TODO: Handle interaction";
             }
             // Now just make the move
-            int originalRow = Row;
-            int originalCol = Col;
+            
             // now change the location of the object, if the move was legal
             Row = newRow;
             Col = newCol;
-            Screen[originalRow, originalCol] = null;
+            if (!(Screen[originalRow, originalCol] is Portal)) Screen[originalRow, originalCol] = null;
             Screen[Row, Col] = this;
             return "";
         }
@@ -83,6 +93,19 @@ namespace asciiadventure {
 
     class Treasure : GameObject {
         public Treasure(int row, int col, Screen screen) : base(row, col, "T", screen) {}
+
+        public override Boolean IsPassable() {
+            return true;
+        }
+    }
+    class Portal : GameObject {
+        public Portal other;
+        public Portal(int row, int col, Screen screen) : base(row, col, "^", screen) {}
+
+        public void Connect(Portal other){
+            this.other = other;
+            other.other = this;
+        }
 
         public override Boolean IsPassable() {
             return true;

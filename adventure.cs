@@ -45,6 +45,10 @@ namespace asciiadventure {
             // add a treasure
             Treasure treasure = new Treasure(6, 2, screen);
 
+            Portal portal1 = new Portal(2, 2, screen);
+            Portal portal2 = new Portal(7, 2, screen);
+            portal1.Connect(portal2);
+
             // add some mobs
             List<Mob> mobs = new List<Mob>();
             mobs.Add(new Mob(9, 9, screen));
@@ -86,21 +90,9 @@ namespace asciiadventure {
 
                 // OK, now move the mobs
                 foreach (Mob mob in mobs){
-                    // TODO: Make mobs smarter, so they jump on the player, if it's possible to do so
-                    List<Tuple<int, int>> moves = screen.GetLegalMoves(mob.Row, mob.Col);
-                    if (moves.Count == 0){
-                        continue;
-                    }
-                    // mobs move randomly
-                    var (deltaRow, deltaCol) = moves[random.Next(moves.Count)];
-                    
-                    if (screen[mob.Row + deltaRow, mob.Col + deltaCol] is Player){
-                        // the mob got the player!
-                        mob.Token = "*";
-                        message += "A MOB GOT YOU! GAME OVER\n";
-                        gameOver = true;
-                    }
-                    mob.Move(deltaRow, deltaCol);
+
+                    gameOver = mob.move(screen, player);
+                    if (gameOver) message += "A MOB GOT YOU! GAME OVER\n";
                 }
 
                 PrintScreen(screen, message, Menu());

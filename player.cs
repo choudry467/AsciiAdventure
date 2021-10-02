@@ -1,7 +1,7 @@
 using System;
 
 namespace asciiadventure {
-    class Player : MovingGameObject {
+    public class Player : MovingGameObject {
         public Player(int row, int col, Screen screen, string name) : base(row, col, "@", screen) {
             Name = name;
         }
