@@ -63,8 +63,16 @@ namespace asciiadventure {
                 Portal portal = (Portal)gameObject;
                 Row = portal.other.Row;
                 Col = portal.other.Col;
-                Screen[originalRow, originalCol] = null;
+                if (!(Screen[originalRow, originalCol] is Portal || Screen[originalRow, originalCol] is Mine)) Screen[originalRow, originalCol] = null;
                 return "";
+            }
+            if (gameObject is Mine && this is Player){
+                this.Token = "*";
+                Row = newRow;
+                Col = newCol;
+                Screen[originalRow, originalCol] = null;
+                Screen[Row, Col] = this;
+                return "Stepped on a Mine";
             }
             if (gameObject != null && !gameObject.IsPassable()) {
                 // TODO: How to handle other objects?
@@ -74,14 +82,14 @@ namespace asciiadventure {
                 // also, when you move, some things may also move
                 // maybe i,j,k,l can attack in different directions?
                 // can have a "shout" command, so some objects require shouting
-                return "TODO: Handle interaction";
+                return "";
             }
             // Now just make the move
             
             // now change the location of the object, if the move was legal
             Row = newRow;
             Col = newCol;
-            if (!(Screen[originalRow, originalCol] is Portal)) Screen[originalRow, originalCol] = null;
+            if (!(Screen[originalRow, originalCol] is Portal || Screen[originalRow, originalCol] is Mine)) Screen[originalRow, originalCol] = null;
             Screen[Row, Col] = this;
             return "";
         }
@@ -111,4 +119,17 @@ namespace asciiadventure {
             return true;
         }
     }
+
+    class Armory : GameObject {
+        public Armory(int row, int col, Screen screen) : base(row, col, "A", screen) {}
+    }
+
+    class Mine : GameObject {
+        public Mine(int row, int col, Screen screen) : base(row, col, "?", screen) {}
+
+        public override Boolean IsPassable() {
+            return true;
+        }
+    }
+
 }

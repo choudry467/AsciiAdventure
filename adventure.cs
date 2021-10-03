@@ -12,7 +12,6 @@ using System.Collections.Generic;
 */
 namespace asciiadventure {
     public class Game {
-        private Random random = new Random();
         private static Boolean Eq(char c1, char c2){
             return c1.ToString().Equals(c2.ToString(), StringComparison.OrdinalIgnoreCase);
         }
@@ -30,13 +29,13 @@ namespace asciiadventure {
         public void Run() {
             Console.ForegroundColor = ConsoleColor.Green;
 
-            Screen screen = new Screen(10, 10);
+            Screen screen = new Screen(10, 15);
             // add a couple of walls
             for (int i=0; i < 3; i++){
                 new Wall(1, 2 + i, screen);
             }
             for (int i=0; i < 4; i++){
-                new Wall(3 + i, 4, screen);
+                new Wall(5 + i, 4, screen);
             }
             
             // add a player
@@ -45,13 +44,17 @@ namespace asciiadventure {
             // add a treasure
             Treasure treasure = new Treasure(6, 2, screen);
 
+            //Add portals and connect them
             Portal portal1 = new Portal(2, 2, screen);
-            Portal portal2 = new Portal(7, 2, screen);
+            Portal portal2 = new Portal(8, 4, screen);
             portal1.Connect(portal2);
+
+            //Add Armory
+            Armory armory = new Armory(0, 10, screen);
 
             // add some mobs
             List<Mob> mobs = new List<Mob>();
-            mobs.Add(new Mob(9, 9, screen));
+            mobs.Add(new Mob(9, 14, screen));
             
             // initially print the game board
             PrintScreen(screen, "Welcome!", Menu());
@@ -66,13 +69,13 @@ namespace asciiadventure {
                 if (Eq(input, 'q')) {
                     break;
                 } else if (Eq(input, 'w')) {
-                    player.Move(-1, 0);
+                    message += player.Move(-1, 0) + "\n";
                 } else if (Eq(input, 's')) {
-                    player.Move(1, 0);
+                    message += player.Move(1, 0) + "\n";
                 } else if (Eq(input, 'a')) {
-                    player.Move(0, -1);
+                    message += player.Move(0, -1) + "\n";
                 } else if (Eq(input, 'd')) {
-                    player.Move(0, 1);
+                    message += player.Move(0, 1) + "\n";
                 } else if (Eq(input, 'i')) {
                     message += player.Action(-1, 0) + "\n";
                 } else if (Eq(input, 'k')) {
@@ -82,8 +85,7 @@ namespace asciiadventure {
                 } else if (Eq(input, 'l')) {
                     message += player.Action(0, 1) + "\n";
                 } else if (Eq(input, 'v')) {
-                    // TODO: handle inventory
-                    message = "You have nothing\n";
+                    player.Mine();
                 } else {
                     message = $"Unknown command: {input}";
                 }
@@ -94,6 +96,7 @@ namespace asciiadventure {
                     gameOver = mob.move(screen, player);
                     if (gameOver) message += "A MOB GOT YOU! GAME OVER\n";
                 }
+                if (player.Token == "*") gameOver = true;
 
                 PrintScreen(screen, message, Menu());
             }

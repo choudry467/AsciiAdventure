@@ -3,9 +3,12 @@ using System.Collections.Generic;
 
 namespace asciiadventure {
     public class Mob : MovingGameObject {
-        public Mob(int row, int col, Screen screen) : base(row, col, "#", screen) {}
+
+        public Boolean alive;
+        public Mob(int row, int col, Screen screen) : base(row, col, "#", screen) { alive = true;}
 
         public Boolean move(Screen screen, Player player){
+            if (!alive) return false;
             List<Tuple<int, int>> moves = screen.GetLegalMoves(this.Row, this.Col);
             if (moves.Count == 0){
                 return false;
@@ -29,6 +32,11 @@ namespace asciiadventure {
                 this.Move(deltaRow, deltaCol);
                 this.Token = "*";
                 return true;
+            }else if (screen[this.Row + deltaRow, this.Col + deltaCol] is Mine){
+                this.Move(deltaRow, deltaCol);
+                this.Delete();
+                alive = false;
+                return false;
             }
             this.Move(deltaRow, deltaCol);
             return false;
